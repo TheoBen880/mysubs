@@ -1,0 +1,35 @@
+flowchart LR
+  cli["CLI entry"]
+  app["Usage orchestrator"]
+  config["Config loader"]
+  cache["Usage cache"]
+  cachekey["Cache key"]
+  keyring["Keyring client"]
+  secret["Secret resolver"]
+  render["Terminal renderer"]
+  progress["Progress spinner"]
+  codex["Codex provider"]
+  claude["Claude provider"]
+  antigravity["Antigravity provider"]
+  copilot["Copilot provider"]
+  openrouter["OpenRouter provider"]
+  opencode["OpenCode provider"]
+
+  cli -->|runUsage| app
+  cli -->|key subcommands| keyring
+  app -->|load config| config
+  app -->|cache entries| cache
+  app -->|derive key| cachekey
+  app -->|usage results| render
+  app -->|spinner while fetching| progress
+  app -->|detect + fetch| codex
+  app -->|detect + fetch| claude
+  app -->|detect + fetch| antigravity
+  app -->|detect + fetch| copilot
+  app -->|detect + fetch| openrouter
+  app -->|detect + fetch| opencode
+  cachekey -->|cache secret| keyring
+  secret -->|key: refs| keyring
+  copilot -->|resolve secrets| secret
+  openrouter -->|resolve secrets| secret
+  opencode -->|resolve secrets| secret

@@ -1,0 +1,27 @@
+{
+  "name": "Mysubs Component Structure",
+  "description": "Internal decomposition of the CLI: orchestration, config, cache, secrets, rendering, and the six self-contained providers of the registry.",
+  "nodes": {
+    "cli": { "name": "CLI entry" },
+    "app": { "name": "Usage orchestrator" },
+    "config": { "name": "Config loader" },
+    "cache": { "name": "Usage cache" },
+    "cachekey": { "name": "Cache key" },
+    "keyring": { "name": "Keyring client" },
+    "secret": { "name": "Secret resolver" },
+    "render": { "name": "Terminal renderer" },
+    "progress": { "name": "Progress spinner" },
+    "codex": { "name": "Codex provider" },
+    "claude": { "name": "Claude provider" },
+    "antigravity": { "name": "Antigravity provider" },
+    "copilot": { "name": "Copilot provider" },
+    "openrouter": { "name": "OpenRouter provider" },
+    "opencode": { "name": "OpenCode provider" }
+  },
+  "groups": {
+    "provider-registry": {
+      "name": "Provider registry",
+      "nodes": ["codex", "claude", "antigravity", "copilot", "openrouter", "opencode"]
+    }
+  }
+}

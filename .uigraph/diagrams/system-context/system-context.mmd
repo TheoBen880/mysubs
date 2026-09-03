@@ -1,0 +1,36 @@
+flowchart LR
+  user["Terminal user"]
+  mysubs["Mysubs CLI"]
+  config["Mysubs config"]
+  cache["Usage cache"]
+  keyring["OS keyring"]
+  keychain["macOS keychain"]
+  codexauth["Codex auth.json"]
+  claudeauth["Claude credentials"]
+  opencodeauth["OpenCode auth.json"]
+  gh["GitHub CLI"]
+  agycli["Antigravity CLI"]
+  agyserver["Antigravity local server"]
+  openai["OpenAI"]
+  anthropic["Anthropic"]
+  github["GitHub API"]
+  openrouter["OpenRouter"]
+  opencode["OpenCode"]
+
+  user -->|runs mysubs| mysubs
+  mysubs -->|read config| config
+  mysubs -->|read/write cache| cache
+  mysubs -->|get/set secrets| keyring
+  mysubs -->|spawn security| keychain
+  mysubs -->|read/write tokens| codexauth
+  mysubs -->|read/write credentials| claudeauth
+  mysubs -->|write-back tokens| opencodeauth
+  mysubs -->|spawn gh| gh
+  mysubs -->|spawn, kill tree| agycli
+  agycli -->|serves quota| agyserver
+  mysubs -->|loopback HTTP| agyserver
+  mysubs -->|HTTPS token + usage| openai
+  mysubs -->|HTTPS token + usage| anthropic
+  mysubs -->|HTTPS copilot usage| github
+  mysubs -->|HTTPS credits + key| openrouter
+  mysubs -->|HTTPS usage endpoints| opencode

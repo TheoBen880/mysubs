@@ -1,0 +1,112 @@
+testCases:
+  - title: Config file loads from the XDG location
+    type: manual
+    order: 1
+    priority: p0
+    tags:
+      - config
+      - regression
+    description: >-
+      Pinned by src/core/config.test.ts: account keys stay separate from
+      display names and the file is read from $XDG_CONFIG_HOME/mysubs/config.json.
+    stepsList:
+      - action: "Create a temporary directory with mysubs/config.json defining one account per provider"
+        expectedResult: "The file is valid JSON with provider blocks"
+      - action: "Point XDG_CONFIG_HOME at the temporary directory and run `pnpm start -- -j`"
+        expectedResult: "Output only contains accounts from the temporary config"
+      - action: "Remove the config and run again with no detected providers"
+        expectedResult: "The run exits 1 and the message names the config file to create"
+    expectedOutcome: "Config path, parsing, and defaults behave as documented"
+    preconditions: "No provider logins are detected in the test environment"
+
+  - title: Secret references resolve from env and keyring
+    type: manual
+    order: 2
+    priority: p0
+    tags:
+      - secrets
+      - regression
+    description: >-
+      env: and key: references are enforced by the account schemas; resolution
+      behavior is pinned by src/lib/secret.test.ts.
+    stepsList:
+      - action: "Configure an account with an apiKey of env:MY_KEY and leave MY_KEY unset"
+        expectedResult: "That account renders an error row about the missing environment variable"
+      - action: "Set MY_KEY and run again"
+        expectedResult: "The account is fetched instead of erroring"
+      - action: "Run `pnpm start -- key set test-secret`, enter a value, then `pnpm start -- key get test-secret`"
+        expectedResult: "The stored value is printed back; an empty secret is rejected"
+    expectedOutcome: "Secret references resolve at run time and raw secrets stay out of the config"
+
+  - title: Account filters select the right targets
+    type: manual
+    order: 3
+    priority: p1
+    tags:
+      - cli
+      - filters
+    stepsList:
+      - action: "Run `pnpm start -- -j codex` with a configured and a detected codex account"
+        expectedResult: "Both codex targets appear in the JSON array"
+      - action: "Run `pnpm start -- -j codex:work` where work is a configured account key"
+        expectedResult: "Only the work account appears"
+      - action: "Run `pnpm start -- -j codex:` with an empty account name"
+        expectedResult: "Only automatically detected codex accounts appear"
+      - action: "Run `pnpm start -- -j doesnotexist`"
+        expectedResult: "The run exits 1 with: no configured account matches \"doesnotexist\""
+    expectedOutcome: "Provider, provider:account, and detected-only filters behave as documented"
+
+  - title: Cache is used, expires, and can be bypassed
+    type: manual
+    order: 4
+    priority: p1
+    tags:
+      - cache
+      - regression
+    description: >-
+      TTL parsing is pinned by src/utils/cache.test.ts; entries live in
+      $XDG_CACHE_HOME/mysubs/cache.json keyed by an HMAC of the provider and
+      account, using the cache-secret keyring entry.
+    stepsList:
+      - action: "Run `pnpm start -- -j` twice with a working provider account"
+        expectedResult: "The second result carries cached: true without a new provider request"
+      - action: "Run `pnpm start -- -j -f`"
+        expectedResult: "The result carries cached: false, proving a fresh fetch"
+      - action: "Set cacheTTL to a short duration, wait past expiry, and run again"
+        expectedResult: "The result is fetched fresh"
+    expectedOutcome: "Cache reads, TTL expiry, and forced refresh behave as documented"
+
+  - title: A failing account does not stop other accounts
+    type: manual
+    order: 5
+    priority: p0
+    tags:
+      - errors
+      - isolation
+    stepsList:
+      - action: "Configure one account with an invalid secret and one valid account, then run `pnpm start -- -j`"
+        expectedResult: "The invalid account yields an error entry while the valid account still reports usage"
+      - action: "Run the same selection without -j"
+        expectedResult: "The error renders as a red row for that account and the other account renders normally"
+      - action: "Check the exit code"
+        expectedResult: "The process exits 0 because the run completed"
+    expectedOutcome: "Per-account failures are reported without aborting the run"
+
+  - title: Usage mapping matches provider responses
+    type: manual
+    order: 6
+    priority: p1
+    tags:
+      - providers
+      - regression
+    description: >-
+      Response-to-usage mapping is pinned by the provider unit suites
+      (antigravity buckets, copilot quota snapshots, opencode Go windows) and
+      by the endpoint and mapping details recorded in the Provider
+      Integrations doc.
+    stepsList:
+      - action: "Run `pnpm test`"
+        expectedResult: "All provider mapping suites pass, including window ordering and percent conversions"
+      - action: "Run `pnpm start -- -j` against a real signed-in account for each available provider"
+        expectedResult: "Each account reports consumption or balance resources under the documented keys (session, weekly, credits, and so on)"
+    expectedOutcome: "Provider responses map to the shared usage result contract"

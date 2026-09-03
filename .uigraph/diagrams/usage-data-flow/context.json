@@ -1,0 +1,21 @@
+{
+  "name": "Mysubs Usage Fetch Data Flow",
+  "description": "How one run of mysubs moves data from config, detection, and the cache through provider fetches to stdout.",
+  "nodes": {
+    "args": { "name": "CLI arguments" },
+    "configfile": { "name": "config.json", "type": "shape", "shape": "document" },
+    "load": { "name": "Load and validate config" },
+    "detect": { "name": "Collect accounts" },
+    "select": { "name": "Filter accounts" },
+    "ckey": { "name": "HMAC cache key" },
+    "cachefile": { "name": "cache.json", "type": "shape", "shape": "document" },
+    "hit": { "name": "Cached result valid?", "type": "shape", "shape": "diamond" },
+    "secrets": { "name": "Secrets and credentials" },
+    "fetch": { "name": "Provider fetch" },
+    "write": { "name": "Write cache entry" },
+    "results": { "name": "Usage results" },
+    "render": { "name": "Render bars" },
+    "jsonout": { "name": "JSON output" },
+    "stdout": { "name": "stdout / stderr" }
+  }
+}
