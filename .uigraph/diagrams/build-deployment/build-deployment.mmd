@@ -1,0 +1,23 @@
+flowchart LR
+  maintainer["Maintainer"]
+  release["GitHub Release"]
+  publishwf["Publish workflow"]
+  build["tsdown build"]
+  dist["dist/index.mjs"]
+  npm["npm registry"]
+  schemajob["Schema workflow"]
+  jsonscript["src/json.ts"]
+  schemafile["schema.json"]
+  schemabranch["schema branch"]
+  usermachine["User machine"]
+
+  maintainer -->|publish release| release
+  release -->|triggers workflow| publishwf
+  publishwf -->|pnpm build| build
+  build -->|bundles CLI| dist
+  dist -->|npm publish| npm
+  publishwf -->|after publish| schemajob
+  schemajob -->|tsx src/json.ts| jsonscript
+  jsonscript -->|generates| schemafile
+  schemafile -->|commit + push| schemabranch
+  npm -->|npm install -g| usermachine

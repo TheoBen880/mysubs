@@ -1,0 +1,17 @@
+{
+  "name": "Mysubs Build and Deployment",
+  "description": "Distribution topology: GitHub release triggers the publish workflow, which ships the bundled CLI to npm and the generated config schema to the schema branch.",
+  "nodes": {
+    "maintainer": { "name": "Maintainer" },
+    "release": { "name": "GitHub Release", "type": "cloud" },
+    "publishwf": { "name": "Publish workflow" },
+    "build": { "name": "tsdown build" },
+    "dist": { "name": "dist/index.mjs", "type": "shape", "shape": "document" },
+    "npm": { "name": "npm registry", "type": "cloud" },
+    "schemajob": { "name": "Schema workflow" },
+    "jsonscript": { "name": "src/json.ts" },
+    "schemafile": { "name": "schema.json", "type": "shape", "shape": "document" },
+    "schemabranch": { "name": "schema branch" },
+    "usermachine": { "name": "User machine" }
+  }
+}

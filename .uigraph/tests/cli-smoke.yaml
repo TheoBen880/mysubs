@@ -1,0 +1,60 @@
+testCases:
+  - title: Typecheck passes
+    type: manual
+    order: 1
+    priority: p1
+    tags:
+      - tooling
+      - typecheck
+    stepsList:
+      - action: "Run `pnpm typecheck`"
+        expectedResult: "tsc --noEmit completes with no output and exit code 0"
+    expectedOutcome: "The codebase type-checks cleanly"
+    preconditions: "Dependencies installed with `pnpm install`"
+
+  - title: Build produces the CLI bundle
+    type: manual
+    order: 2
+    priority: p1
+    tags:
+      - tooling
+      - build
+    stepsList:
+      - action: "Run `pnpm build`"
+        expectedResult: "tsdown writes dist/index.mjs as an ESM bundle"
+      - action: "Inspect the mysubs bin mapping in package.json"
+        expectedResult: "The bin points at dist/index.mjs"
+    expectedOutcome: "The publishable bundle exists and matches the bin entry"
+    preconditions: "Dependencies installed with `pnpm install`"
+
+  - title: Unit test suite passes
+    type: manual
+    order: 3
+    priority: p0
+    tags:
+      - vitest
+      - regression
+    description: >-
+      `pnpm test` runs every vitest suite under src/ with NO_COLOR=1. The suites
+      cover config loading, usage bar colors, secret references, provider
+      option defaults, antigravity quota parsing, copilot and opencode usage
+      mapping against stubbed fetch, cache TTL parsing, formatting, home path
+      expansion, and the progress spinner.
+    stepsList:
+      - action: "Run `pnpm test`"
+        expectedResult: "All vitest suites pass"
+    expectedOutcome: "Full unit suite green"
+
+  - title: CLI prints its usage for --help
+    type: manual
+    order: 4
+    priority: p2
+    tags:
+      - cli
+      - smoke
+    stepsList:
+      - action: "Run `pnpm start -- --help`"
+        expectedResult: >-
+          The help text shows the description, the optional subs arguments,
+          the -j, -f, and -v options, and the key subcommand
+    expectedOutcome: "The command parser registers every documented command and flag"

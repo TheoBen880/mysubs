@@ -1,0 +1,35 @@
+flowchart TD
+  args["CLI arguments"]
+  configfile["config.json"]
+  load["Load and validate config"]
+  detect["Collect accounts"]
+  select["Filter accounts"]
+  ckey["HMAC cache key"]
+  cachefile["cache.json"]
+  hit{"Cached result valid?"}
+  secrets["Secrets and credentials"]
+  fetch["Provider fetch"]
+  write["Write cache entry"]
+  results["Usage results"]
+  render["Render bars"]
+  jsonout["JSON output"]
+  stdout["stdout / stderr"]
+
+  configfile -->|JSON config| load
+  load -->|accounts + options| detect
+  args -->|subs filters| select
+  args -->|force flag| hit
+  detect -->|account targets| select
+  select -->|provider + account| ckey
+  ckey -->|HMAC key| cachefile
+  cachefile -->|stored entry| hit
+  hit -->|yes| results
+  hit -->|no| fetch
+  secrets -->|tokens + keys| fetch
+  fetch -->|fresh result| write
+  write -->|entry + expiry| cachefile
+  fetch -->|usage result| results
+  results -->|usage resources| render
+  results -->|results array| jsonout
+  render -->|usage bars| stdout
+  jsonout -->|JSON array| stdout

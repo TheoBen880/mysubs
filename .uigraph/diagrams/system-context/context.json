@@ -1,0 +1,23 @@
+{
+  "name": "Mysubs System Context",
+  "description": "The mysubs CLI and every machine-local store, subprocess, and remote provider API it touches.",
+  "nodes": {
+    "user": { "name": "Terminal user" },
+    "mysubs": { "name": "Mysubs CLI" },
+    "config": { "name": "Mysubs config", "type": "shape", "shape": "document" },
+    "cache": { "name": "Usage cache", "type": "shape", "shape": "document" },
+    "keyring": { "name": "OS keyring", "type": "shape", "shape": "database" },
+    "keychain": { "name": "macOS keychain", "type": "shape", "shape": "database" },
+    "codexauth": { "name": "Codex auth.json", "type": "shape", "shape": "document" },
+    "claudeauth": { "name": "Claude credentials", "type": "shape", "shape": "document" },
+    "opencodeauth": { "name": "OpenCode auth.json", "type": "shape", "shape": "document" },
+    "gh": { "name": "GitHub CLI" },
+    "agycli": { "name": "Antigravity CLI" },
+    "agyserver": { "name": "Antigravity local server" },
+    "openai": { "name": "OpenAI", "type": "cloud" },
+    "anthropic": { "name": "Anthropic", "type": "cloud" },
+    "github": { "name": "GitHub API", "type": "cloud" },
+    "openrouter": { "name": "OpenRouter", "type": "cloud" },
+    "opencode": { "name": "OpenCode", "type": "cloud" }
+  }
+}

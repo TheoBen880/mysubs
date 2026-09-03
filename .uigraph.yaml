@@ -1,10 +1,108 @@
 version: 1
+
 service:
     name: Mysubs
-    category: service
-    description: Mysubs service
+    category: cli
+    description: CLI that aggregates AI subscription usage across Codex, Claude, Antigravity, GitHub Copilot, OpenRouter, and OpenCode accounts
     repository:
         provider: github
         url: https://github.com/TheoBen880/mysubs
     ownership:
         team: Engineering
+
+dependencies:
+    - name: openai-codex
+      service: OpenAI
+      direction: downstream
+      criticality: soft
+      type: http
+      description: Codex accounts refresh OAuth tokens at auth.openai.com and read usage from the ChatGPT backend usage endpoint; failures are reported per account
+      apiEndpointNames:
+          - POST /oauth/token
+          - GET /backend-api/wham/usage
+    - name: anthropic-claude
+      service: Anthropic
+      direction: downstream
+      criticality: soft
+      type: http
+      description: Claude accounts refresh OAuth tokens at platform.claude.com and read usage from api.anthropic.com; failures are reported per account
+      apiEndpointNames:
+          - POST /v1/oauth/token
+          - GET /api/oauth/usage
+    - name: github-copilot
+      service: GitHub
+      direction: downstream
+      criticality: soft
+      type: http
+      description: Copilot accounts read quota from the copilot_internal user endpoint using a token from the environment or the GitHub CLI; failures are reported per account
+      apiEndpointNames:
+          - GET /copilot_internal/user
+    - name: openrouter-usage
+      service: OpenRouter
+      direction: downstream
+      criticality: soft
+      type: http
+      description: OpenRouter accounts read credits and key usage from two parallel GET requests; failures are reported per account
+      apiEndpointNames:
+          - GET /api/v1/credits
+          - GET /api/v1/key
+    - name: opencode-usage
+      service: OpenCode
+      direction: downstream
+      criticality: soft
+      type: http
+      description: OpenCode Go accounts read rolling, weekly, and monthly usage; Zen accounts scrape workspace subscription usage through the _server endpoint; failures are reported per account
+      apiEndpointNames:
+          - GET /zen/go/v1/usage
+          - GET /_server
+    - name: antigravity-cli-server
+      service: Antigravity CLI
+      direction: downstream
+      criticality: soft
+      type: http
+      description: Quota is read from the antigravity CLI's local language server on loopback, spawning the CLI under script when it is not already running; failures are reported per account
+      apiEndpointNames:
+          - RetrieveUserQuotaSummary
+          - GetUserStatus
+
+architectureDiagrams:
+    - name: System Context
+      path: .uigraph/diagrams/system-context/system-context.mmd
+      contextPath: .uigraph/diagrams/system-context/context.json
+    - name: Component Structure
+      path: .uigraph/diagrams/component-structure/component-structure.mmd
+      contextPath: .uigraph/diagrams/component-structure/context.json
+    - name: Usage Fetch Data Flow
+      path: .uigraph/diagrams/usage-data-flow/usage-data-flow.mmd
+      contextPath: .uigraph/diagrams/usage-data-flow/context.json
+    - name: Build and Deployment
+      path: .uigraph/diagrams/build-deployment/build-deployment.mmd
+      contextPath: .uigraph/diagrams/build-deployment/context.json
+
+testPacks:
+    - name: CLI Smoke
+      type: smoke
+      environment: local
+      testCasesPath: .uigraph/tests/cli-smoke.yaml
+    - name: CLI Regression
+      type: regression
+      environment: local
+      testCasesPath: .uigraph/tests/cli-regression.yaml
+
+docs:
+    - name: CLI Usage
+      path: .uigraph/docs/cli-usage.md
+      fileType: markdown
+      description: Commands, flags, account filters, output, progress, and exit codes of the mysubs CLI
+    - name: Configuration Reference
+      path: .uigraph/docs/configuration-reference.md
+      fileType: markdown
+      description: Config file location, root fields with defaults, provider account shapes, secret references, environment variables, and cache behavior
+    - name: Provider Integrations
+      path: .uigraph/docs/provider-integrations.md
+      fileType: markdown
+      description: Detection, credential sources, endpoints, and usage mapping for each of the six providers
+    - name: Build and Release
+      path: .uigraph/docs/build-and-release.md
+      fileType: markdown
+      description: Tooling, npm scripts, vitest coverage, and the npm publish plus JSON schema release pipeline
